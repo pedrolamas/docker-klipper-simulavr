@@ -30,8 +30,8 @@ To override any of these, just map the alternative file:
 docker run -d \
   --name klipper-simulavr \
   --net=host \
-  -v my-printer.cfg:/home/printer/klipper_config/printer.cfg \
-  -v my-moonraker.conf:/home/printer/klipper_config/moonraker.conf \
+  -v my-printer.cfg:/printer/klipper_config/printer.cfg \
+  -v my-moonraker.conf:/printer/klipper_config/moonraker.conf \
   ei99070/docker-klipper-simulavr
 ```
 

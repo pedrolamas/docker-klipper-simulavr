@@ -59,7 +59,7 @@ RUN mv /build/simulavr/build/debian/python3-simulavr*.deb . \
 
 FROM debian as final
 
-WORKDIR /home/printer
+WORKDIR /printer
 
 COPY --from=build /output .
 
@@ -89,14 +89,15 @@ RUN apt-get update -qq \
   && apt clean -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && groupadd --force -g 1000 printer \
-  && useradd -rm -d /home/printer -g 1000 -u 1000 printer \
-  && usermod -aG dialout,tty,sudo printer \
-  && echo 'printer ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers.d/printer \
+  && useradd -rm -d /printer -g 1000 -u 1000 printer \
+  && mkdir klipper_logs \
   && chown -hR printer:printer .
 
-COPY ./supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./supervisord/supervisord.conf /etc/supervisor/supervisord.conf
 COPY ./supervisord/start.sh /bin/start
 
 RUN chmod +x /bin/start
+
+USER printer
 
 ENTRYPOINT ["/bin/start"]
