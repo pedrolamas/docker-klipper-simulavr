@@ -5,25 +5,18 @@ FROM debian as build
 RUN apt update -qq \
   && apt install -y --no-install-recommends \
     avr-libc \
+    ca-certificates \
     cmake \
-    doxygen \
     fakeroot \
     g++ \
     git \
-    graphviz \
     help2man \
-    iverilog \
     make \
-    nano-tiny \
     python3 \
     python3-dev \
-    python3-pip \
     rst2pdf \
     swig \
     texinfo \
-    time \
-    tk-dev \
-    valgrind \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
@@ -63,8 +56,8 @@ WORKDIR /printer
 
 COPY --from=build /output .
 
-RUN apt-get update -qq \
-  && apt-get install -y --no-install-recommends \
+RUN apt update -qq \
+  && apt install -y --no-install-recommends \
     gcc \
     iproute2 \
     libcurl4-openssl-dev \
@@ -90,6 +83,7 @@ RUN apt-get update -qq \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && groupadd --force -g 1000 printer \
   && useradd -rm -d /printer -g 1000 -u 1000 printer \
+  && mkdir gcode_files \
   && mkdir klipper_logs \
   && chown -hR printer:printer .
 
