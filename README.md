@@ -14,7 +14,10 @@ Simple Docker image running a Simulavr, Klipper, and Moonraker
 Create and run the new container as you would normally do:
 
 ```sh
-docker run -d ei99070/docker-klipper-simulavr
+docker run -d \
+  --name klipper-simulavr \
+  --net=host \
+  ei99070/docker-klipper-simulavr
 ```
 
 This will start Klipper with a simulates Atmel ATmega micro-controller, and Moonraker on port 7125.
@@ -24,7 +27,12 @@ These default configuration files used can be found on the [/klipper_config](/kl
 To override any of these, just map the alternative file:
 
 ```sh
-docker run -d -v my-printer.cfg:/home/printer/klipper_config/printer.cfg ei99070/docker-klipper-simulavr
+docker run -d \
+  --name klipper-simulavr \
+  --net=host \
+  -v my-printer.cfg:/home/printer/klipper_config/printer.cfg \
+  -v my-moonraker.conf:/home/printer/klipper_config/moonraker.conf \
+  ei99070/docker-klipper-simulavr
 ```
 
 ## License
