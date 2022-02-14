@@ -85,6 +85,7 @@ RUN apt update -qq \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && groupadd --force -g 1000 printer \
   && useradd -rm -d /printer -g 1000 -u 1000 printer \
+  && echo 'printer ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/printer \
   && mkdir gcode_files \
   && mkdir klipper_logs \
   && chown -hR printer:printer .
