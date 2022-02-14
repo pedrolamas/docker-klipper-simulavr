@@ -3,7 +3,7 @@
 FROM debian as build
 
 RUN apt update -qq \
-  && apt install -y --no-install-recommends \
+  && apt install -y --no-install-recommends --no-install-suggests \
     avr-libc \
     ca-certificates \
     cmake \
@@ -50,14 +50,14 @@ RUN mv /build/simulavr/build/debian/python3-simulavr*.deb . \
 
 ## final
 
-FROM debian as final
+FROM debian:bullseye-slim as final
 
 WORKDIR /printer
 
 COPY --from=build /output .
 
 RUN apt update -qq \
-  && apt install -y --no-install-recommends \
+  && apt install -y --no-install-recommends --no-install-suggests \
     gcc \
     iproute2 \
     libcurl4-openssl-dev \
@@ -67,6 +67,7 @@ RUN apt update -qq \
     libsodium-dev \
     libssl-dev \
     packagekit \
+    python3 \
     python3-dev \
     python3-libgpiod \
     python3-virtualenv \
@@ -74,6 +75,7 @@ RUN apt update -qq \
     supervisor \
     zlib1g-dev \
     ./python3-simulavr*.deb \
+  && rm -f ./python3-simulavr*.deb \
   && virtualenv -p python3 klippy-env \
   && ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt \
   && virtualenv -p python3 moonraker-env \
