@@ -90,10 +90,9 @@ RUN apt update -qq \
   && mkdir klipper_logs \
   && chown -hR printer:printer .
 
-COPY ./supervisord/supervisord.conf /etc/supervisor/supervisord.conf
-COPY ./supervisord/start.sh /bin/start
+COPY ./rootfs /
 
-RUN chmod +x /bin/start
+RUN chmod +x /bin/start /bin/systemctl
 
 USER printer
 
