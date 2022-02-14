@@ -20,18 +20,38 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
-This will start Klipper with a simulates Atmel ATmega micro-controller, and Moonraker on port 7125.
+This will start Klipper with a simulated Atmel ATmega micro-controller, and Moonraker on port 7125.
 
-These default configuration files used can be found on the [/klipper_config](/klipper_config) folder.
+The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 
-To override any of these, just map the alternative file:
+This is the runtime folder structure:
+
+```txt
+/printer
+  /gcode-files
+  /klipper
+  /klipper_config
+    /generic-simulavr.cfg
+    /moonraker.conf
+    /printer.cfg
+  /klipper_logs
+    /klippy.log
+    /moonraker.log
+    /supervisord.log
+  /klippy-env
+  /moonraker
+  /moonraker-env
+```
+
+Any of these files can be overrided by mapping the folder or the specific file.
+
+For example, here is how to override the default `printer.cfg`:
 
 ```sh
 docker run -d \
   --name klipper-simulavr \
   --net=host \
   -v my-printer.cfg:/printer/klipper_config/printer.cfg \
-  -v my-moonraker.conf:/printer/klipper_config/moonraker.conf \
   ei99070/docker-klipper-simulavr
 ```
 
