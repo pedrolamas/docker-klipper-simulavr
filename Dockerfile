@@ -38,11 +38,11 @@ RUN ( \
     && make PYTHON=python3 \
     && mv out/klipper.elf simulavr.elf \
     && rm -rf .git out \
-) \
-&& virtualenv -p python3 klippy-env \
-&& ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt \
-&& ./klippy-env/bin/python -m compileall klipper/klippy \
-&& ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
+  ) \
+  && virtualenv -p python3 klippy-env \
+  && ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt \
+  && ./klippy-env/bin/python -m compileall klipper/klippy \
+  && ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
 
 RUN git clone --depth 1 https://github.com/Arksine/moonraker \
   && ( \
