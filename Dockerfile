@@ -61,8 +61,7 @@ RUN mv /build/simulavr/build/debian/python3-simulavr*.deb . \
   && mv /build/klipper . \
   && mv /build/klippy-env . \
   && mv /build/moonraker . \
-  && mv /build/moonraker-env . \
-  && cp klipper/config/generic-simulavr.cfg klipper_config/
+  && mv /build/moonraker-env .
 
 
 ## final
