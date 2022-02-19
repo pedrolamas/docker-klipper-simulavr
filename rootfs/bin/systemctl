@@ -50,16 +50,18 @@ UNITS=($@)
 case "$COMMAND" in
 show)
   for UNIT in "${UNITS[@]}"; do
+    UNIT_STATE=$(sudo /usr/bin/supervisorctl status "$UNIT" | awk '{print tolower($2)}')
+
     for PROPERTY in "${PROPERTIES[@]}"; do
       case "$PROPERTY" in
       LoadState)
         echo "loaded"
         ;;
       ActiveState)
-        echo "active"
+        [ "$UNIT_STATE" = "running" ] && echo "active" || echo "inactive"
         ;;
       SubState)
-        sudo /usr/bin/supervisorctl status "$UNIT" | awk '{print tolower($2)}'
+        [ "$UNIT_STATE" = "running" ] && echo "running" || echo "dead"
         ;;
       *)
         echo "unknown"
@@ -71,7 +73,7 @@ show)
   ;;
 
 list-units)
-  sudo /usr/bin/supervisorctl status | awk '{print $1".service\tloaded\tactive\t"tolower($2)"\t"$1" service"}'
+  sudo /usr/bin/supervisorctl status | awk '{print $1".service\tloaded\t"(tolower($2)=="running"?"active\trunning":"inactive\tdead")"\t"$1" service"}'
   ;;
 
 start | stop | restart)
