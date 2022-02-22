@@ -50,8 +50,7 @@ RUN git clone --depth 1 https://github.com/Arksine/moonraker \
     && rm -rf .git \
   ) \
   && virtualenv -p python3 moonraker-env \
-  && ./moonraker-env/bin/pip install -r moonraker/scripts/moonraker-requirements.txt \
-  && rm -rf /var/lib/apt/lists/*
+  && ./moonraker-env/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
 WORKDIR /output
 
