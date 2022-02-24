@@ -2,6 +2,9 @@
 
 FROM debian as build
 
+ARG KLIPPER_SHA
+ARG MOONRAKER_SHA
+
 RUN apt update -qq \
   && apt install -y --no-install-recommends --no-install-suggests \
     avr-libc \
@@ -35,6 +38,7 @@ COPY klipper/simulavr.config ./klipper/.config
 
 RUN ( \
     cd klipper \
+    && ( [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true ) \
     && make PYTHON=python3 \
     && mv out/klipper.elf simulavr.elf \
     && rm -rf .git out \
@@ -47,6 +51,7 @@ RUN ( \
 RUN git clone --depth 1 https://github.com/Arksine/moonraker \
   && ( \
     cd moonraker \
+    && ( [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true ) \
     && rm -rf .git \
   ) \
   && virtualenv -p python3 moonraker-env \
