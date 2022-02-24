@@ -7,7 +7,9 @@
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/pedrolamas?style=social)](https://twitter.com/pedrolamas '@pedrolamas')
 
-Simple Docker image running a Simulavr, Klipper, and Moonraker
+Simple Docker image running [Klipper](https://github.com/Klipper3d/klipper/) with Simulavr, and [Moonraker](https://github.com/Arksine/moonraker/)
+
+This repo will run a GitHub action every 20 minutes to check for new code on the "master" branches of the Klipper and Moonraker repositories, and creates a new Docker image if there are any modifications.
 
 ## Usage
 
