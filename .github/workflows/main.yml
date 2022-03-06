@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "0 * * * *"
   workflow_dispatch:
+    inputs:
+      forceBuild:
+        description: "Force image build"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -27,7 +33,7 @@ jobs:
       - name: Check if Docker image already exists
         id: check
         run: |
-          BUILD_IMAGE=false
+          BUILD_IMAGE=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceBuild == 'true' }}
 
           docker manifest inspect ghcr.io/${{ github.repository }}:sha-${{ steps.repo.outputs.image_sha }} > /dev/null || BUILD_IMAGE=true
 
