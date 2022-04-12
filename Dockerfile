@@ -5,8 +5,8 @@ FROM debian as build
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
 
-RUN apt update -qq \
-  && apt install -y --no-install-recommends --no-install-suggests \
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends --no-install-suggests \
     avr-libc \
     cmake \
     fakeroot \
@@ -76,8 +76,8 @@ WORKDIR /printer
 
 COPY --from=build /output .
 
-RUN apt update -qq \
-  && apt install -y --no-install-recommends --no-install-suggests \
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     iproute2 \
     libcurl4-openssl-dev \
@@ -91,8 +91,8 @@ RUN apt update -qq \
     zlib1g-dev \
     ./python3-simulavr*.deb \
   && rm -f ./python3-simulavr*.deb \
-  && apt autoremove -y \
-  && apt clean -y \
+  && apt-get autoremove -y \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && groupadd --force -g 1000 printer \
   && useradd -rm -d /printer -g 1000 -u 1000 printer \
