@@ -8,7 +8,7 @@ die ()
 
 MY_NAME="${0##*/}"
 
-PARSED_ARGUMENTS="$(getopt -n "$MY_NAME" -o t:p:a --long type:,property:,all,value,no-legend,plain -- "$@")" || exit $?
+PARSED_ARGUMENTS="$(getopt -n "$MY_NAME" -o t:p:al --long type:,property:,all,full,value,no-legend,plain -- "$@")" || exit $?
 
 eval set -- "$PARSED_ARGUMENTS"
 while true; do
@@ -21,6 +21,9 @@ while true; do
     shift 2
     ;;
   -a | --all)
+    shift
+    ;;
+  -l | --full)
     shift
     ;;
   --value)
@@ -84,6 +87,9 @@ start | stop | restart)
       sudo /usr/bin/supervisorctl "$COMMAND" "$UNIT"
     fi
   done
+  ;;
+
+enable | disable | reload | daemon-reload)
   ;;
 
 *)
