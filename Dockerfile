@@ -57,6 +57,23 @@ RUN git clone --depth 1 https://github.com/Arksine/moonraker \
   && virtualenv -p python3 moonraker-env \
   && ./moonraker-env/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 
+RUN git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer \
+  && ( \
+    cd mjpg-streamer \
+    && ( \
+      cd mjpg-streamer-experimental \
+      && mkdir _build \
+      && ( \
+        cd _build \
+        && cmake -DPLUGIN_INPUT_HTTP=OFF -DPLUGIN_INPUT_UVC=OFF -DPLUGIN_OUTPUT_FILE=OFF -DPLUGIN_OUTPUT_RTSP=OFF -DPLUGIN_OUTPUT_UDP=OFF .. \
+      ) \
+      && make \
+      && rm -rf _build \
+    ) \
+  )
+
+COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images
+
 WORKDIR /output
 
 COPY klipper_config ./klipper_config
@@ -65,8 +82,8 @@ RUN mv /build/simulavr/build/debian/python3-simulavr*.deb . \
   && mv /build/klipper . \
   && mv /build/klippy-env . \
   && mv /build/moonraker . \
-  && mv /build/moonraker-env .
-
+  && mv /build/moonraker-env . \
+  && mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer
 
 ## final
 
