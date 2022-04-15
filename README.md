@@ -7,7 +7,7 @@
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/pedrolamas?style=social)](https://twitter.com/pedrolamas '@pedrolamas')
 
-Simple Docker image running [Klipper](https://github.com/Klipper3d/klipper/) with Simulavr, and [Moonraker](https://github.com/Arksine/moonraker/)
+Simple Docker image running [Klipper](https://github.com/Klipper3d/klipper/) with Simulavr, [Moonraker](https://github.com/Arksine/moonraker/), and [mjpg-streamer](https://github.com/jacksonliam/mjpg-streamer).
 
 This repo will run a GitHub action every hour to check for new code on the "master" branches of the Klipper and Moonraker repositories, and creates a new Docker image if there are any modifications.
 
@@ -22,7 +22,17 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
-This will start Klipper with a simulated Atmel ATmega micro-controller, and Moonraker on port 7125.
+This will start Klipper with a simulated Atmel ATmega micro-controller, Moonraker on port 7125, and mjpg-streamer on port 8080.
+
+If you need to remap the default ports, run the container under the bridge network instead:
+
+```sh
+docker run -d \
+  --name klipper-simulavr \
+  -p 7125:7125 \
+  -p 8080:8080 \
+  ei99070/docker-klipper-simulavr
+```
 
 The default configuration files used can be found on the [klipper_config](/klipper_config) folder.
 
@@ -33,7 +43,6 @@ This is the runtime folder structure:
   /gcode-files
   /klipper
   /klipper_config
-    /generic-simulavr.cfg
     /moonraker.conf
     /printer.cfg
   /klipper_logs
@@ -41,6 +50,7 @@ This is the runtime folder structure:
     /moonraker.log
     /supervisord.log
   /klippy-env
+  /mjpg-streamer
   /moonraker
   /moonraker-env
 ```
