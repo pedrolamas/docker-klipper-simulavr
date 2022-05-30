@@ -72,6 +72,10 @@ RUN git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer \
     ) \
   )
 
+RUN git clone --depth 1 https://github.com/th33xitus/kiauh
+
+RUN git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse
+
 COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images
 
 WORKDIR /output
@@ -83,7 +87,11 @@ RUN mv /build/simulavr/build/debian/python3-simulavr*.deb . \
   && mv /build/klippy-env . \
   && mv /build/moonraker . \
   && mv /build/moonraker-env . \
-  && mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer
+  && mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer \
+  && mv /build/kiauh/resources/gcode_shell_command.py ./klipper/klippy/extras/gcode_shell_command.py \
+  && mv /build/kiauh/resources/shell_command.cfg ./klipper_config/shell_command.cfg \
+  && mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py \
+  && mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./klipper_config/timelapse.cfg
 
 ## final
 
