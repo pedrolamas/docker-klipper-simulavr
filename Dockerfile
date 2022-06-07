@@ -14,6 +14,8 @@ RUN apt-get update -qq \
     git \
     help2man \
     libcurl4-openssl-dev \
+    libldap2-dev \
+    libsasl2-dev \
     libssl-dev \
     make \
     python3 \
