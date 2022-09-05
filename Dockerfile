@@ -6,6 +6,7 @@ FROM debian as build
 
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
+ARG PYTHON_VERSION
 
 RUN <<eot
   apt-get update -qq
@@ -21,6 +22,8 @@ RUN <<eot
     libsasl2-dev \
     libssl-dev \
     make \
+    python \
+    python-dev \
     python3 \
     python3-dev \
     python3-virtualenv \
@@ -54,11 +57,11 @@ RUN <<eot
   (
     cd klipper
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
-    make PYTHON=python3
+    make PYTHON=python${PYTHON_VERSION}
     mv out/klipper.elf simulavr.elf
     rm -rf .git out
   )
-  virtualenv -p python3 klippy-env
+  virtualenv -p python${PYTHON_VERSION} klippy-env
   ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt
   ./klippy-env/bin/python -m compileall klipper/klippy
   ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
