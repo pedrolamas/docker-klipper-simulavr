@@ -1,5 +1,7 @@
 # syntax = docker/dockerfile:1.4
 
+ARG PYTHON_VERSION=3
+
 ## build
 
 FROM debian as build
@@ -123,6 +125,8 @@ eot
 
 FROM debian:bullseye-slim as final
 
+ARG PYTHON_VERSION
+
 WORKDIR /printer
 
 COPY --from=build /output .
@@ -138,6 +142,7 @@ RUN <<eot
     libopenjp2-7 \
     libsodium-dev \
     libssl-dev \
+    python${PYTHON_VERSION} \
     sudo \
     supervisor \
     zlib1g-dev
