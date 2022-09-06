@@ -67,6 +67,20 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
+## Available tags
+
+For Klipper running on Python2:
+
+- `latest` or `latest-python2`: points to Klipper and Moonraker "master" branches
+- `klipper-sha-<hash>` or `klipper-sha-<hash>-python2`: points to the Klipper GitHub commit hash
+- `moonraker-sha-<hash>` or `mooranker-sha-<hash>-python2`: points to the Moonraker GitHub commit hash
+
+For Klipper running on Python3:
+
+- `latest-python3`: points to Klipper and Moonraker "master" branches
+- `klipper-sha-<hash>-python3`: points to the Klipper GitHub commit hash
+- `mooranker-sha-<hash>-python3`: points to the Moonraker GitHub commit hash
+
 ## License
 
 MIT

@@ -76,10 +76,10 @@ jobs:
             type=raw,value=moonraker-sha-${{ needs.setup.outputs.moonraker_sha }}-python${{ matrix.python_version }}
             type=raw,value=sha-${{ needs.setup.outputs.image_sha }}-python${{ matrix.python_version }}
             type=raw,value=latest-python${{ matrix.python_version }},enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=raw,value=klipper-sha-${{ needs.setup.outputs.klipper_sha }},enable=${{ matrix.python_version == 3 }}
-            type=raw,value=moonraker-sha-${{ needs.setup.outputs.moonraker_sha }},enable=${{ matrix.python_version == 3 }}
-            type=raw,value=sha-${{ needs.setup.outputs.image_sha }},enable=${{ matrix.python_version == 3 }}
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) && matrix.python_version == 3 }}
+            type=raw,value=klipper-sha-${{ needs.setup.outputs.klipper_sha }},enable=${{ matrix.python_version == 2 }}
+            type=raw,value=moonraker-sha-${{ needs.setup.outputs.moonraker_sha }},enable=${{ matrix.python_version == 2 }}
+            type=raw,value=sha-${{ needs.setup.outputs.image_sha }},enable=${{ matrix.python_version == 2 }}
+            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) && matrix.python_version == 2 }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

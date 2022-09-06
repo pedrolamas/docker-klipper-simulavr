@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.4
 
-ARG PYTHON_VERSION=3
+ARG PYTHON_VERSION=2
 
 ## build
 
