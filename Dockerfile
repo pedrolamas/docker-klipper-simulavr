@@ -145,6 +145,7 @@ RUN <<eot
     python${PYTHON_VERSION} \
     sudo \
     supervisor \
+    wget \
     zlib1g-dev
   apt-get autoremove -y
   apt-get clean -y
