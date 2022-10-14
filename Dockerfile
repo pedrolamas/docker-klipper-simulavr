@@ -118,7 +118,14 @@ RUN <<eot
   mv /build/kiauh/resources/shell_command.cfg ./klipper_config/shell_command.cfg
   mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
   mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./klipper_config/timelapse.cfg
-  mkdir ./gcode_files ./klipper_logs
+  mkdir ./database ./gcode_files ./klipper_logs ./printer_data
+  (
+    cd printer_data
+    ln -s ../klipper_config config
+    ln -s ../database database
+    ln -s ../gcode_files gcodes
+    ln -s ../klipper_logs logs
+  )
 eot
 
 ## final
@@ -145,7 +152,6 @@ RUN <<eot
     python${PYTHON_VERSION} \
     sudo \
     supervisor \
-    wget \
     zlib1g-dev
   apt-get autoremove -y
   apt-get clean -y
