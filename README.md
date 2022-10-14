@@ -40,6 +40,7 @@ This is the runtime folder structure:
 
 ```txt
 /printer
+  /.moonraker_database
   /gcode-files
   /klipper
   /klipper_config
@@ -53,6 +54,12 @@ This is the runtime folder structure:
   /mjpg-streamer
   /moonraker
   /moonraker-env
+  /printer_data
+    /config -> ../klipper_config
+    /database -> ../.moonraker_database
+    /gcodes -> ../gcode_files
+    /logs -> ../klipper_logs
+  /pysimulavr
 ```
 
 Any of these files can be overrided by mapping the folder or the specific file.
