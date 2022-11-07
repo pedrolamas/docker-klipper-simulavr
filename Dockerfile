@@ -53,7 +53,7 @@ eot
 
 RUN git clone --depth 1 https://github.com/klipper3d/klipper
 
-COPY klipper/simulavr.config ./klipper/.config
+COPY klipper ./klipper/
 
 RUN <<eot
   (
