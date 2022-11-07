@@ -47,7 +47,7 @@ class VirtualPin:
         self._name = pin_params['pin']
         self._pullup = pin_params['pullup']
         self._invert = pin_params['invert']
-        self._value = 0.
+        self._value = self._pullup
         printer = self._mcu.get_printer()
         self._real_mcu = printer.lookup_object('mcu')
         gcode = printer.lookup_object('gcode')
@@ -140,12 +140,26 @@ class AdcVirtualPin(VirtualPin):
 class EndstopVirtualPin(VirtualPin):
     def __init__(self, mcu, pin_params):
         VirtualPin.__init__(self, mcu, pin_params)
+        self._steppers = []
 
     def add_stepper(self, stepper):
-        pass
+        self._steppers.append(stepper)
 
     def query_endstop(self, print_time):
         return self._value
+
+    def home_start(self, print_time, sample_time, sample_count, rest_time,
+                   triggered=True):
+        reactor = self._mcu.get_printer().get_reactor()
+        completion = reactor.completion()
+        completion.complete(True)
+        return completion
+
+    def home_wait(self, home_end_time):
+        return 1
+
+    def get_steppers(self):
+        return list(self._steppers)
 
     def get_status(self, eventtime):
         return {
