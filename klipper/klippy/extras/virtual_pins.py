@@ -10,6 +10,14 @@ class VirtualPins:
         ppins = self._printer.lookup_object('pins')
         ppins.register_chip('virtual_pin', self)
         self._pins = {}
+        self._oid_count = 0
+        self._config_callbacks = []
+        self._printer.register_event_handler("klippy:connect",
+                                             self.handle_connect)
+
+    def handle_connect(self):
+        for cb in self._config_callbacks:
+            cb()
 
     def setup_pin(self, pin_type, pin_params):
         ppins = self._printer.lookup_object('pins')
@@ -30,6 +38,29 @@ class VirtualPins:
         self._pins[name] = pin
         return pin
 
+    def create_oid(self):
+        self._oid_count += 1
+        return self._oid_count - 1
+
+    def register_config_callback(self, cb):
+        self._config_callbacks.append(cb)
+
+    def seconds_to_clock(self, time):
+        return 0
+
+    def add_config_cmd(self, cmd, is_init=False, on_restart=False):
+        pass
+
+    def alloc_command_queue(self):
+        pass
+
+    def lookup_command(self, msgformat, cq=None):
+        return VirtualCommand()
+
+    def lookup_query_command(self, msgformat, respformat, oid=None,
+                             cq=None, is_async=False):
+        return VirtualCommandQuery(respformat, oid)
+
     def get_printer(self):
         return self._printer
 
@@ -40,6 +71,25 @@ class VirtualPins:
                     for name, pin in self._pins.items()
             }
         }
+
+class VirtualCommand:
+    def send(self, data=(), minclock=0, reqclock=0):
+        pass
+
+class VirtualCommandQuery:
+    def __init__(self, respformat, oid):
+        entries = respformat.split()
+        self._response = {}
+        for entry in entries[1:]:
+            key, _ = entry.split('=')
+            self._response[key] = oid if key == 'oid' else 1
+
+    def send(self, data=(), minclock=0, reqclock=0):
+        return self._response
+
+    def send_with_preface(self, preface_cmd, preface_data=(), data=(),
+                          minclock=0, reqclock=0):
+        return self._response
 
 class VirtualPin:
     def __init__(self, mcu, pin_params):
@@ -115,7 +165,7 @@ class AdcVirtualPin(VirtualPin):
 
     def handle_connect(self):
         reactor = self._mcu.get_printer().get_reactor()
-        reactor.register_timer(self._raise_callback, reactor.NOW)
+        reactor.register_timer(self._raise_callback, reactor.monotonic() + 2.)
 
     def setup_adc_callback(self, report_time, callback):
         self._callback = callback
