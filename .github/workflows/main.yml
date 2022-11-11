@@ -31,9 +31,9 @@ jobs:
           MOONRAKER_SHA=$(git ls-remote https://github.com/Arksine/moonraker master | awk '{print $1}')
           IMAGE_SHA=$(echo $KLIPPER_SHA-$MOONRAKER_SHA | sha1sum | awk '{print $1}')
 
-          echo ::set-output name=klipper_sha::${KLIPPER_SHA}
-          echo ::set-output name=moonraker_sha::${MOONRAKER_SHA}
-          echo ::set-output name=image_sha::${IMAGE_SHA}
+          echo "klipper_sha=${KLIPPER_SHA}" >> $GITHUB_OUTPUT
+          echo "moonraker_sha=${MOONRAKER_SHA}" >> $GITHUB_OUTPUT
+          echo "image_sha=${IMAGE_SHA}" >> $GITHUB_OUTPUT
 
       - name: Check if new Docker image should be built
         id: check
@@ -44,7 +44,7 @@ jobs:
             docker manifest inspect ghcr.io/${{ github.repository }}:sha-${{ steps.repo.outputs.image_sha }} > /dev/null || BUILD_IMAGE=true
           fi
 
-          echo ::set-output name=build_image::${BUILD_IMAGE}
+          echo "build_image=${BUILD_IMAGE}" >> $GITHUB_OUTPUT
 
   build:
     name: Build and deploy (python${{ matrix.python_version }})
@@ -56,17 +56,17 @@ jobs:
         python_version: [ 2, 3 ]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Prepare GitHub metadata
         id: github_meta
         run: |
           REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}
-          echo ::set-output name=repository_name::${REPOSITORY_NAME}
+          echo "repository_name=${REPOSITORY_NAME}" >> $GITHUB_OUTPUT
 
       - name: Prepare Docker image metadata
         id: docker_meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.github_meta.outputs.repository_name }}
@@ -82,26 +82,26 @@ jobs:
             type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) && matrix.python_version == 2 }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
