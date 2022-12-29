@@ -5,7 +5,8 @@
 
 [![Release](https://github.com/pedrolamas/docker-klipper-simulavr/workflows/Release/badge.svg)](https://github.com/pedrolamas/docker-klipper-simulavr/actions 'Build Status')
 
-[![Twitter Follow](https://img.shields.io/twitter/follow/pedrolamas?style=social)](https://twitter.com/pedrolamas '@pedrolamas')
+[![Follow pedrolamas on Twitter](https://img.shields.io/twitter/follow/pedrolamas?label=Follow%20@pedrolamas%20on%20Twitter&style=social)](https://twitter.com/pedrolamas)
+[![Follow pedrolamas on Mastodon](https://img.shields.io/mastodon/follow/109365776481898704?label=Follow%20@pedrolamas%20on%20Mastodon&domain=https%3A%2F%2Fhachyderm.io&style=social)](https://hachyderm.io/@pedrolamas)
 
 Simple Docker image running [Klipper](https://github.com/Klipper3d/klipper/) with Simulavr, [Moonraker](https://github.com/Arksine/moonraker/), and [mjpg-streamer](https://github.com/jacksonliam/mjpg-streamer).
 
@@ -76,17 +77,17 @@ docker run -d \
 
 ## Available tags
 
-For Klipper running on Python2:
-
-- `latest` or `latest-python2`: points to Klipper and Moonraker "master" branches
-- `klipper-sha-<hash>` or `klipper-sha-<hash>-python2`: points to the Klipper GitHub commit hash
-- `moonraker-sha-<hash>` or `mooranker-sha-<hash>-python2`: points to the Moonraker GitHub commit hash
-
 For Klipper running on Python3:
 
-- `latest-python3`: points to Klipper and Moonraker "master" branches
-- `klipper-sha-<hash>-python3`: points to the Klipper GitHub commit hash
-- `mooranker-sha-<hash>-python3`: points to the Moonraker GitHub commit hash
+- `latest` or `latest-python3`: points to Klipper and Moonraker "master" branches
+- `klipper-sha-<hash>` or `klipper-sha-<hash>-python3`: points to the Klipper GitHub commit hash
+- `moonraker-sha-<hash>` or `mooranker-sha-<hash>-python3`: points to the Moonraker GitHub commit hash
+
+For Klipper running on Python2:
+
+- `latest-python2`: points to Klipper and Moonraker "master" branches
+- `klipper-sha-<hash>-python2`: points to the Klipper GitHub commit hash
+- `mooranker-sha-<hash>-python2`: points to the Moonraker GitHub commit hash
 
 ## License
 
