@@ -75,6 +75,16 @@ docker run -d \
   ei99070/docker-klipper-simulavr
 ```
 
+## Extras
+
+### virtual_pins
+
+The `virtual_pins` module is included in `klipper/klippy/extras` folder and enabled in `printer.cfg`.
+
+This module allows configurable pins to be set to `virtual_pin:<id>` as a way to mitigate the limited number of available pins provided by the virtual MCU.
+
+**Note:** `virtual_pins` will be able to simulate most pins, with the major exception of steppers `step_pin` and `dir_pin` (use MCU pins for these).
+
 ## Available tags
 
 For Klipper running on Python3:
