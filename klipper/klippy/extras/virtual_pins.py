@@ -45,10 +45,16 @@ class VirtualPins:
     def register_config_callback(self, cb):
         self._config_callbacks.append(cb)
 
+    def add_config_cmd(self, cmd, is_init=False, on_restart=False):
+        pass
+
     def seconds_to_clock(self, time):
         return 0
 
-    def add_config_cmd(self, cmd, is_init=False, on_restart=False):
+    def get_printer(self):
+        return self._printer
+
+    def register_response(self, cb, msg, oid=None):
         pass
 
     def alloc_command_queue(self):
@@ -61,8 +67,8 @@ class VirtualPins:
                              cq=None, is_async=False):
         return VirtualCommandQuery(respformat, oid)
 
-    def get_printer(self):
-        return self._printer
+    def get_enumerations(self):
+        return {}
 
     def get_status(self, eventtime):
         return {
