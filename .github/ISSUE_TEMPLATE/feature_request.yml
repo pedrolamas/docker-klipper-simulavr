@@ -5,9 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        This issue form is for feature requests with the Docker images only!
-        If your feature request is for Mainsail, please report to [Mainsail](https://github.com/mainsail-crew/mainsail/issues) instead.
-        If you've found a bug, please use [bug_report](/new?template=bug_report.yml)
+        This issue form is for feature requests only!
+        If you've found a bug, please use [bug_report](new?template=bug_report.yml)
   - type: textarea
     id: problem-description
     attributes:
