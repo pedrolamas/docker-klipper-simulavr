@@ -27,6 +27,7 @@ while true; do
     shift
     ;;
   --value)
+    VALUE="1"
     shift
     ;;
   --no-legend)
@@ -48,14 +49,21 @@ done
 COMMAND="$1"
 shift
 
-UNITS=($@)
+OTHER_ARGUMENTS=($@)
 
 case "$COMMAND" in
 show)
-  for UNIT in "${UNITS[@]}"; do
+  for UNIT in "${OTHER_ARGUMENTS[@]}"; do
+    if [ -n "$FIRST_DONE" ]; then
+      echo ""
+    fi
+
     UNIT_STATE=$(sudo /usr/bin/supervisorctl status "$UNIT" | awk '{print tolower($2)}')
 
     for PROPERTY in "${PROPERTIES[@]}"; do
+      if [ -z "$VALUE" ]; then
+        echo -n "$PROPERTY="
+      fi
       case "$PROPERTY" in
       LoadState)
         echo "loaded"
@@ -71,7 +79,21 @@ show)
         ;;
       esac
     done
-    echo ""
+
+    FIRST_DONE="1"
+  done
+  ;;
+
+status)
+  PID_UNIT_LIST=$(sudo /usr/bin/supervisorctl status | awk '{print $4$1}')
+
+  for PID in "${OTHER_ARGUMENTS[@]}"; do
+    UNIT_NAME=$(echo "$PID_UNIT_LIST" | grep "$PID," | awk -F"," '{print $2}')
+    if [ -z "$UNIT_NAME" ]; then
+      echo "Failed to get unit for PID $PID: PID $PID does not belong to any loaded unit."
+    else
+      echo "- $UNIT_NAME.service"
+    fi
   done
   ;;
 
@@ -80,7 +102,7 @@ list-units)
   ;;
 
 start | stop | restart)
-  for UNIT in "${UNITS[@]}"; do
+  for UNIT in "${OTHER_ARGUMENTS[@]}"; do
     if [ "$UNIT" = "klipper" ]; then
       sudo /usr/bin/supervisorctl "$COMMAND" simulavr klipper
     else
