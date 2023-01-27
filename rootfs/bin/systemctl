@@ -6,6 +6,8 @@ die ()
   exit 1
 }
 
+EXIT_CODE=0
+
 MY_NAME="${0##*/}"
 
 PARSED_ARGUMENTS="$(getopt -n "$MY_NAME" -o t:p:al --long type:,property:,all,full,value,no-legend,plain -- "$@")" || exit $?
@@ -91,6 +93,7 @@ status)
     UNIT_NAME=$(echo "$PID_UNIT_LIST" | grep "$PID," | awk -F"," '{print $2}')
     if [ -z "$UNIT_NAME" ]; then
       echo "Failed to get unit for PID $PID: PID $PID does not belong to any loaded unit."
+      EXIT_CODE=4
     else
       echo "- $UNIT_NAME.service"
     fi
@@ -119,4 +122,4 @@ enable | disable | reload | daemon-reload)
   ;;
 esac
 
-exit 0
+exit $EXIT_CODE
