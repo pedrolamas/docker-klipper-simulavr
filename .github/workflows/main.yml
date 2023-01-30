@@ -41,7 +41,7 @@ jobs:
           BUILD_IMAGE=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceBuild == 'true' }}
 
           if ! "$BUILD_IMAGE"; then
-            docker manifest inspect ghcr.io/${{ github.repository }}:sha-${{ steps.repo.outputs.image_sha }} > /dev/null || BUILD_IMAGE=true
+            docker buildx imagetools inspect ghcr.io/${{ github.repository }}:sha-${{ steps.repo.outputs.image_sha }} > /dev/null || BUILD_IMAGE=true
           fi
 
           echo "build_image=${BUILD_IMAGE}" >> $GITHUB_OUTPUT
