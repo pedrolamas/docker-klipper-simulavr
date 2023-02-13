@@ -43,7 +43,7 @@ while true; do
     break
     ;;
   *)
-    die "unexpected option: $1 - this should not happen."
+    die "invalid option -- '$1'"
     ;;
   esac
 done
@@ -95,7 +95,7 @@ status)
       echo "Failed to get unit for PID $PID: PID $PID does not belong to any loaded unit."
       EXIT_CODE=4
     else
-      echo "- $UNIT_NAME.service"
+      echo "* $UNIT_NAME.service"
     fi
   done
   ;;
@@ -118,7 +118,7 @@ enable | disable | reload | daemon-reload)
   ;;
 
 *)
-  die "unknown command '$COMMAND'"
+  die "Unknown command verb $COMMAND."
   ;;
 esac
 
