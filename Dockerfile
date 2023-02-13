@@ -115,9 +115,9 @@ RUN <<eot
   mv /build/simulavr/build/pysimulavr/pysimulavr .
   mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer
   mv /build/kiauh/resources/gcode_shell_command.py ./klipper/klippy/extras/gcode_shell_command.py
-  mv /build/kiauh/resources/shell_command.cfg ./klipper_config/shell_command.cfg
+  mv /build/kiauh/resources/shell_command.cfg ./klipper_config/printer/shell_command.cfg
   mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
-  mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./klipper_config/timelapse.cfg
+  mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./klipper_config/printer/timelapse.cfg
   mkdir ./.moonraker_database ./gcode_files ./klipper_logs ./printer_data
   (
     cd printer_data
