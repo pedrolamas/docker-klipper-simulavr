@@ -51,7 +51,7 @@ RUN <<eot
   )
 eot
 
-RUN git clone --depth 1 https://github.com/klipper3d/klipper
+RUN git clone https://github.com/klipper3d/klipper
 
 COPY klipper ./klipper/
 
@@ -70,7 +70,7 @@ RUN <<eot
 eot
 
 RUN <<eot
-  git clone --depth 1 https://github.com/Arksine/moonraker
+  git clone https://github.com/Arksine/moonraker
   (
     cd moonraker
     [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
