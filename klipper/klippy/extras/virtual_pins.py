@@ -48,6 +48,9 @@ class VirtualPins:
     def add_config_cmd(self, cmd, is_init=False, on_restart=False):
         pass
 
+    def get_query_slot(self, oid):
+        return 0
+
     def seconds_to_clock(self, time):
         return 0
 
@@ -69,6 +72,12 @@ class VirtualPins:
 
     def get_enumerations(self):
         return {}
+
+    def print_time_to_clock(self, print_time):
+        return 0
+
+    def estimated_print_time(self, eventtime):
+        return 0
 
     def get_status(self, eventtime):
         return {
