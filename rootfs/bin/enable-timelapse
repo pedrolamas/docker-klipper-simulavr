@@ -1,0 +1,13 @@
+#!/bin/bash
+
+sudo apt-get update -qq
+sudo apt-get install -y --no-install-recommends --no-install-suggests \
+  ffmpeg \
+  wget
+
+sed -i 's/^# \[include printer\/timelapse.cfg\]/[include printer\/timelapse.cfg]/' /printer/klipper_config/printer.cfg
+
+sed -i 's/^# \[timelapse\]/[timelapse]/' /printer/klipper_config/moonraker.conf
+
+systemctl restart klipper
+systemctl restart moonraker

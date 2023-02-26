@@ -164,7 +164,7 @@ eot
 
 COPY ./rootfs /
 
-RUN chmod +x /bin/start /bin/systemctl
+RUN chmod +x /bin/start /bin/systemctl /bin/enable-timelapse
 
 USER printer
 
