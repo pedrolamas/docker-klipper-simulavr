@@ -107,9 +107,16 @@ COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images
 
 WORKDIR /output
 
-COPY klipper_config ./klipper_config
+COPY klipper_config ./printer_data/config
 
 RUN <<eot
+  (
+    cd printer_data
+    mkdir comms
+    mkdir database
+    mkdir gcodes
+    mkdir logs
+  )
   mv /build/klipper .
   mv /build/klippy-env .
   mv /build/moonraker .
@@ -118,17 +125,9 @@ RUN <<eot
   mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer
   mv /build/klipper-virtual-pins/virtual_pins.py ./klipper/klippy/extras/virtual_pins.py
   mv /build/kiauh/resources/gcode_shell_command.py ./klipper/klippy/extras/gcode_shell_command.py
-  mv /build/kiauh/resources/shell_command.cfg ./klipper_config/printer/shell_command.cfg
+  mv /build/kiauh/resources/shell_command.cfg ./printer_data/config/printer/shell_command.cfg
   mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
-  mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./klipper_config/printer/timelapse.cfg
-  mkdir ./.moonraker_database ./gcode_files ./klipper_logs ./printer_data
-  (
-    cd printer_data
-    ln -s ../klipper_config config
-    ln -s ../.moonraker_database database
-    ln -s ../gcode_files gcodes
-    ln -s ../klipper_logs logs
-  )
+  mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./printer_data/config/printer/timelapse.cfg
 eot
 
 ## final

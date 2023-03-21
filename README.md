@@ -41,25 +41,22 @@ This is the runtime folder structure:
 
 ```txt
 /printer
-  /.moonraker_database
-  /gcode-files
   /klipper
-  /klipper_config
-    /moonraker.conf
-    /printer.cfg
-  /klipper_logs
-    /klippy.log
-    /moonraker.log
-    /supervisord.log
   /klippy-env
   /mjpg-streamer
   /moonraker
   /moonraker-env
   /printer_data
-    /config -> ../klipper_config
-    /database -> ../.moonraker_database
-    /gcodes -> ../gcode_files
-    /logs -> ../klipper_logs
+    /config
+      /moonraker.conf
+      /printer.cfg
+    /database
+    /gcodes
+    /logs
+      /klippy.log
+      /moonraker.log
+      /supervisord.log
+    /moonraker.asvc
   /pysimulavr
 ```
 
@@ -71,7 +68,7 @@ For example, here is how to override the default `printer.cfg`:
 docker run -d \
   --name klipper-simulavr \
   --net=host \
-  -v my-printer.cfg:/printer/klipper_config/printer.cfg \
+  -v my-printer.cfg:/printer/printer_data/config/printer.cfg \
   ei99070/docker-klipper-simulavr
 ```
 
