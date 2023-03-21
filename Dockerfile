@@ -97,6 +97,8 @@ RUN <<eot
   )
 eot
 
+RUN git clone --depth 1 https://github.com/pedrolamas/klipper-virtual-pins
+
 RUN git clone --depth 1 https://github.com/th33xitus/kiauh
 
 RUN git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse
@@ -114,6 +116,7 @@ RUN <<eot
   mv /build/moonraker-env .
   mv /build/simulavr/build/pysimulavr/pysimulavr .
   mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer
+  mv /build/klipper-virtual-pins/virtual_pins.py ./klipper/klippy/extras/virtual_pins.py
   mv /build/kiauh/resources/gcode_shell_command.py ./klipper/klippy/extras/gcode_shell_command.py
   mv /build/kiauh/resources/shell_command.cfg ./klipper_config/printer/shell_command.cfg
   mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
