@@ -1,125 +1,128 @@
 #!/bin/bash
+(
+  flock -x -w 3 200
 
-die ()
-{
-  echo "$MY_NAME: $1"
-  exit 1
-}
+  die ()
+  {
+    echo "$MY_NAME: $1"
+    exit 1
+  }
 
-EXIT_CODE=0
+  EXIT_CODE=0
 
-MY_NAME="${0##*/}"
+  MY_NAME="${0##*/}"
 
-PARSED_ARGUMENTS="$(getopt -n "$MY_NAME" -o t:p:al --long type:,property:,all,full,value,no-legend,plain -- "$@")" || exit $?
+  PARSED_ARGUMENTS="$(getopt -n "$MY_NAME" -o t:p:al --long type:,property:,all,full,value,no-legend,plain -- "$@")" || exit $?
 
-eval set -- "$PARSED_ARGUMENTS"
-while true; do
-  case "$1" in
-  -t | --type)
-    shift 2
+  eval set -- "$PARSED_ARGUMENTS"
+  while true; do
+    case "$1" in
+    -t | --type)
+      shift 2
+      ;;
+    -p | --property)
+      IFS="," read -a PROPERTIES <<<$2
+      shift 2
+      ;;
+    -a | --all)
+      shift
+      ;;
+    -l | --full)
+      shift
+      ;;
+    --value)
+      VALUE="1"
+      shift
+      ;;
+    --no-legend)
+      shift
+      ;;
+    --plain)
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      die "invalid option -- '$1'"
+      ;;
+    esac
+  done
+
+  COMMAND="$1"
+  shift
+
+  OTHER_ARGUMENTS=($@)
+
+  case "$COMMAND" in
+  show)
+    for UNIT in "${OTHER_ARGUMENTS[@]}"; do
+      if [ -n "$FIRST_DONE" ]; then
+        echo ""
+      fi
+
+      UNIT_STATE=$(sudo /usr/bin/supervisorctl status "$UNIT" | awk '{print tolower($2)}')
+
+      for PROPERTY in "${PROPERTIES[@]}"; do
+        if [ -z "$VALUE" ]; then
+          echo -n "$PROPERTY="
+        fi
+        case "$PROPERTY" in
+        LoadState)
+          echo "loaded"
+          ;;
+        ActiveState)
+          [ "$UNIT_STATE" = "running" ] && echo "active" || echo "inactive"
+          ;;
+        SubState)
+          [ "$UNIT_STATE" = "running" ] && echo "running" || echo "dead"
+          ;;
+        *)
+          echo "unknown"
+          ;;
+        esac
+      done
+
+      FIRST_DONE="1"
+    done
     ;;
-  -p | --property)
-    IFS="," read -a PROPERTIES <<<$2
-    shift 2
+
+  status)
+    PID_UNIT_LIST=$(sudo /usr/bin/supervisorctl status | awk '{print $4$1}')
+
+    for PID in "${OTHER_ARGUMENTS[@]}"; do
+      UNIT_NAME=$(echo "$PID_UNIT_LIST" | grep "$PID," | awk -F"," '{print $2}')
+      if [ -z "$UNIT_NAME" ]; then
+        echo "Failed to get unit for PID $PID: PID $PID does not belong to any loaded unit."
+        EXIT_CODE=4
+      else
+        echo "* $UNIT_NAME.service"
+      fi
+    done
     ;;
-  -a | --all)
-    shift
+
+  list-units)
+    sudo /usr/bin/supervisorctl status | awk '{print $1".service\tloaded\t"(tolower($2)=="running"?"active\trunning":"inactive\tdead")"\t"$1" service"}'
     ;;
-  -l | --full)
-    shift
+
+  start | stop | restart)
+    for UNIT in "${OTHER_ARGUMENTS[@]}"; do
+      if [ "$UNIT" = "klipper" ]; then
+        sudo /usr/bin/supervisorctl "$COMMAND" simulavr klipper
+      else
+        sudo /usr/bin/supervisorctl "$COMMAND" "$UNIT"
+      fi
+    done
     ;;
-  --value)
-    VALUE="1"
-    shift
+
+  enable | disable | reload | daemon-reload)
     ;;
-  --no-legend)
-    shift
-    ;;
-  --plain)
-    shift
-    ;;
-  --)
-    shift
-    break
-    ;;
+
   *)
-    die "invalid option -- '$1'"
+    die "Unknown command verb $COMMAND."
     ;;
   esac
-done
 
-COMMAND="$1"
-shift
-
-OTHER_ARGUMENTS=($@)
-
-case "$COMMAND" in
-show)
-  for UNIT in "${OTHER_ARGUMENTS[@]}"; do
-    if [ -n "$FIRST_DONE" ]; then
-      echo ""
-    fi
-
-    UNIT_STATE=$(sudo /usr/bin/supervisorctl status "$UNIT" | awk '{print tolower($2)}')
-
-    for PROPERTY in "${PROPERTIES[@]}"; do
-      if [ -z "$VALUE" ]; then
-        echo -n "$PROPERTY="
-      fi
-      case "$PROPERTY" in
-      LoadState)
-        echo "loaded"
-        ;;
-      ActiveState)
-        [ "$UNIT_STATE" = "running" ] && echo "active" || echo "inactive"
-        ;;
-      SubState)
-        [ "$UNIT_STATE" = "running" ] && echo "running" || echo "dead"
-        ;;
-      *)
-        echo "unknown"
-        ;;
-      esac
-    done
-
-    FIRST_DONE="1"
-  done
-  ;;
-
-status)
-  PID_UNIT_LIST=$(sudo /usr/bin/supervisorctl status | awk '{print $4$1}')
-
-  for PID in "${OTHER_ARGUMENTS[@]}"; do
-    UNIT_NAME=$(echo "$PID_UNIT_LIST" | grep "$PID," | awk -F"," '{print $2}')
-    if [ -z "$UNIT_NAME" ]; then
-      echo "Failed to get unit for PID $PID: PID $PID does not belong to any loaded unit."
-      EXIT_CODE=4
-    else
-      echo "* $UNIT_NAME.service"
-    fi
-  done
-  ;;
-
-list-units)
-  sudo /usr/bin/supervisorctl status | awk '{print $1".service\tloaded\t"(tolower($2)=="running"?"active\trunning":"inactive\tdead")"\t"$1" service"}'
-  ;;
-
-start | stop | restart)
-  for UNIT in "${OTHER_ARGUMENTS[@]}"; do
-    if [ "$UNIT" = "klipper" ]; then
-      sudo /usr/bin/supervisorctl "$COMMAND" simulavr klipper
-    else
-      sudo /usr/bin/supervisorctl "$COMMAND" "$UNIT"
-    fi
-  done
-  ;;
-
-enable | disable | reload | daemon-reload)
-  ;;
-
-*)
-  die "Unknown command verb $COMMAND."
-  ;;
-esac
-
-exit $EXIT_CODE
+  exit $EXIT_CODE
+) 200>/tmp/${MY_NAME}.lock
