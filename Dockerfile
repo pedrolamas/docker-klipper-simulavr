@@ -4,7 +4,7 @@ ARG PYTHON_VERSION=3
 
 ## build
 
-FROM debian as build
+FROM debian:bullseye as build
 
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
