@@ -1,14 +1,11 @@
 # syntax = docker/dockerfile:1.4
 
-ARG PYTHON_VERSION=3
-
 ## build
 
-FROM debian:bullseye as build
+FROM debian:bookworm as build
 
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
-ARG PYTHON_VERSION
 
 RUN <<eot
   apt-get update -qq
@@ -20,12 +17,11 @@ RUN <<eot
     git \
     help2man \
     libcurl4-openssl-dev \
+    libffi-dev \
     libldap2-dev \
     libsasl2-dev \
     libssl-dev \
     make \
-    python \
-    python-dev \
     python3 \
     python3-dev \
     python3-virtualenv \
@@ -59,11 +55,11 @@ RUN <<eot
   (
     cd klipper
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
-    make PYTHON=python${PYTHON_VERSION}
+    make
     mv out/klipper.elf simulavr.elf
     rm -rf .git out
   )
-  virtualenv -p python${PYTHON_VERSION} klippy-env
+  virtualenv klippy-env
   ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt
   ./klippy-env/bin/python -m compileall klipper/klippy
   ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
@@ -76,7 +72,7 @@ RUN <<eot
     [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
     rm -rf .git
   )
-  virtualenv -p python3 moonraker-env
+  virtualenv moonraker-env
   ./moonraker-env/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
 eot
 
@@ -132,9 +128,7 @@ eot
 
 ## final
 
-FROM debian:bullseye-slim as final
-
-ARG PYTHON_VERSION
+FROM debian:bookworm-slim as final
 
 WORKDIR /printer
 
@@ -151,7 +145,6 @@ RUN <<eot
     libopenjp2-7 \
     libsodium-dev \
     libssl-dev \
-    python${PYTHON_VERSION} \
     sudo \
     supervisor \
     zlib1g-dev
@@ -168,4 +161,4 @@ COPY ./rootfs /
 
 USER printer
 
-ENTRYPOINT ["/bin/start"]
+ENTRYPOINT ["/usr/bin/start"]
