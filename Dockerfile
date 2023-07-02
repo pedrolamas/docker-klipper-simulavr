@@ -57,7 +57,7 @@ RUN <<eot
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
     make
     mv out/klipper.elf simulavr.elf
-    rm -rf .git/* out
+    rm -rf .git out
   )
   virtualenv klippy-env
   ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt
@@ -70,7 +70,7 @@ RUN <<eot
   (
     cd moonraker
     [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
-    rm -rf .git/*
+    rm -rf .git
   )
   virtualenv moonraker-env
   ./moonraker-env/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
