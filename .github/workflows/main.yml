@@ -12,6 +12,8 @@ on:
         type: boolean
 
 env:
+  KLIPPER_REPOSITORY: https://github.com/klipper3d/klipper
+  MOONRAKER_REPOSITORY: https://github.com/Arksine/moonraker
   IS_DEFAULT_BRANCH: ${{ endsWith(github.ref, github.event.repository.default_branch) }}
 
 jobs:
@@ -27,8 +29,8 @@ jobs:
       - name: Get Klipper and Moonraker metadata
         id: repo
         run: |
-          KLIPPER_SHA=$(git ls-remote https://github.com/klipper3d/klipper master | awk '{print $1}')
-          MOONRAKER_SHA=$(git ls-remote https://github.com/Arksine/moonraker master | awk '{print $1}')
+          KLIPPER_SHA=$(git ls-remote $KLIPPER_REPOSITORY master | awk '{print $1}')
+          MOONRAKER_SHA=$(git ls-remote $MOONRAKER_REPOSITORY master | awk '{print $1}')
           IMAGE_SHA=$(echo $KLIPPER_SHA-$MOONRAKER_SHA | sha1sum | awk '{print $1}')
 
           echo "klipper_sha=${KLIPPER_SHA}" >> $GITHUB_OUTPUT
@@ -100,7 +102,9 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           build-args: |
+            KLIPPER_REPOSITORY: ${{ env.KLIPPER_REPOSITORY }}
             KLIPPER_SHA=${{ needs.setup.outputs.klipper_sha }}
+            MOONRAKER_REPOSITORY: ${{ env.MOONRAKER_REPOSITORY }}
             MOONRAKER_SHA=${{ needs.setup.outputs.moonraker_sha }}
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}

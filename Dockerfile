@@ -1,9 +1,11 @@
-# syntax = docker/dockerfile:1.4
+# syntax = docker/dockerfile:1.6
 
 ## build
 
 FROM debian:bookworm as build
 
+ARG KLIPPER_REPOSITORY=https://github.com/klipper3d/klipper
+ARG MOONRAKER_REPOSITORY=https://github.com/Arksine/moonraker
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
 
@@ -47,7 +49,7 @@ RUN <<eot
   )
 eot
 
-RUN git clone https://github.com/klipper3d/klipper
+RUN git clone $KLIPPER_REPOSITORY klipper
 
 COPY klipper ./klipper/
 
@@ -66,7 +68,7 @@ RUN <<eot
 eot
 
 RUN <<eot
-  git clone https://github.com/Arksine/moonraker
+  git clone $MOONRAKER_REPOSITORY moonraker
   (
     cd moonraker
     [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
