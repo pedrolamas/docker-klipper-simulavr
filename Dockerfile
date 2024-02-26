@@ -59,7 +59,7 @@ RUN <<eot
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
     make
     mv out/klipper.elf simulavr.elf
-    rm -rf .git out
+    rm -rf .git lib out src
   )
   virtualenv klippy-env
   ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt
@@ -140,8 +140,8 @@ RUN <<eot
   apt-get update -qq
   apt-get install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
+    curl \
     iproute2 \
-    libcurl4-openssl-dev \
     libjpeg-dev \
     liblmdb-dev \
     libopenjp2-7 \
