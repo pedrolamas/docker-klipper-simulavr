@@ -63,7 +63,6 @@ RUN <<eot
   )
   virtualenv klippy-env
   ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt
-  ./klippy-env/bin/python -m compileall klipper/klippy
   ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
 eot
 
@@ -126,6 +125,9 @@ RUN <<eot
   mv /build/kiauh/resources/shell_command.cfg ./printer_data/config/printer/shell_command.cfg
   mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
   mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./printer_data/config/printer/timelapse.cfg
+  ./klippy-env/bin/python -m compileall klipper/klippy
+  ./moonraker-env/bin/python -m compileall moonraker/moonraker
+  python3 -m compileall pysimulavr
 eot
 
 ## final
