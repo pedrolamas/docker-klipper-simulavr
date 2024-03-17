@@ -1,0 +1,16 @@
+#!/bin/bash
+
+git --version &>/dev/null || (
+  sudo apt-get update -qq
+  sudo apt-get install -y --no-install-recommends --no-install-suggests \
+    git
+)
+
+(
+  cd klipper
+  git init
+  git remote add origin $KLIPPER_REPOSITORY
+  git fetch origin
+  git checkout -b master --track origin/master -f
+  [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
+)

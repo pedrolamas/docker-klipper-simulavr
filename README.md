@@ -79,6 +79,20 @@ Some Klipper extra modules are included as part of this image, specifically:
 - `virtual_pins` - https://github.com/pedrolamas/klipper-virtual-pins
 - `gcode_shell_command` - https://github.com/th33xitus/kiauh
 
+## Convenience scripts
+
+The image includes the following convenience scripts:
+
+- `enable-timelapse` - installs the Moonraker Timelapse dependencies, updates the configuration files, and restart Klipper and Moonraker
+- `restore-klipper-repo` - restores the Klipper git repository to the same point where the docker image was created
+- `restore-moonraker-repo` - restores the Moonraker git repository to the same point where the docker image was created
+
+Once the Docker container has started, these can be easily run:
+
+```sh
+docker exec -it klipper-simulavr enable-timelapse
+```
+
 ## Available tags
 
 - `latest`: points to Klipper and Moonraker "master" branches

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+git --version &>/dev/null || (
+  sudo apt-get update -qq
+  sudo apt-get install -y --no-install-recommends --no-install-suggests \
+    git
+)
+
+(
+  cd moonraker
+  git init
+  git remote add origin $MOONRAKER_REPOSITORY
+  git fetch origin
+  git checkout -b master --track origin/master -f
+  [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
+)
