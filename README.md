@@ -99,6 +99,20 @@ docker exec -it klipper-simulavr enable-timelapse
 - `klipper-sha-<hash>`: points to the Klipper GitHub commit hash
 - `moonraker-sha-<hash>`: points to the Moonraker GitHub commit hash
 
+## FAQ
+
+### I keep getting "MCU 'mcu' shutdown: Timer too close"
+
+Start the container with `SIMULAVR_PACING_RATE` environment variable set to something like `0.2`, like this:
+
+```sh
+docker run -d \
+  --name klipper-simulavr \
+  --net=host \
+  -e SIMULAVR_PACING_RATE=0.2
+  ei99070/docker-klipper-simulavr
+```
+
 ## Support my work
 
 A lot of time and effort goes into the development of this and other open-source projects.
