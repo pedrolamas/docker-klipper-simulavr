@@ -113,11 +113,23 @@ jobs:
             MOONRAKER_REPOSITORY: ${{ env.MOONRAKER_REPOSITORY }}
             MOONRAKER_SHA=${{ needs.setup.outputs.moonraker_sha }}
           push: true
+          sbom: true
+          provenance: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
 
-      - name: Attest Docker image
+      - name: Attest Docker Hub image
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.github_meta.outputs.repository_name }}
+          subject-digest: ${{ steps.docker_push.outputs.digest }}
+          push-to-registry: true
+
+      - name: Attest Container Registry image
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: ghcr.io/${{ github.repository }}
           subject-digest: ${{ steps.docker_push.outputs.digest }}
+          push-to-registry: true
