@@ -11,6 +11,7 @@ git --version &>/dev/null || (
   git init
   git remote add origin $MOONRAKER_REPOSITORY
   git fetch origin
-  git checkout -b master --track origin/master -f
+  DEFAULT_BRANCH=$(git remote show "${1:-origin}" | sed -n '/HEAD branch/s/.*: //p')
+  git checkout -b $DEFAULT_BRANCH --track origin/$DEFAULT_BRANCH -f
   [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
 )

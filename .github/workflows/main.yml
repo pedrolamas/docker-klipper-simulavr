@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     - cron: "0 * * * *"
   workflow_dispatch:
@@ -29,8 +32,8 @@ jobs:
       - name: Get Klipper and Moonraker metadata
         id: repo
         run: |
-          KLIPPER_SHA=$(git ls-remote $KLIPPER_REPOSITORY master | awk '{print $1}')
-          MOONRAKER_SHA=$(git ls-remote $MOONRAKER_REPOSITORY master | awk '{print $1}')
+          KLIPPER_SHA=$(git ls-remote $KLIPPER_REPOSITORY HEAD | awk '{print $1}')
+          MOONRAKER_SHA=$(git ls-remote $MOONRAKER_REPOSITORY HEAD | awk '{print $1}')
           IMAGE_SHA=$(echo $KLIPPER_SHA-$MOONRAKER_SHA | sha1sum | awk '{print $1}')
 
           echo "klipper_sha=${KLIPPER_SHA}" >> $GITHUB_OUTPUT
@@ -40,7 +43,7 @@ jobs:
       - name: Check if new Docker image should be built
         id: check
         run: |
-          BUILD_IMAGE=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceBuild == 'true' }}
+          BUILD_IMAGE=${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.forceBuild == 'true') }}
 
           if ! "$BUILD_IMAGE"; then
             docker buildx imagetools inspect ghcr.io/${{ github.repository }}:sha-${{ steps.repo.outputs.image_sha }} > /dev/null || BUILD_IMAGE=true
