@@ -15,6 +15,7 @@ ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
 
 RUN <<eot
+  set -e
   apt-get update -qq
   apt-get install -y --no-install-recommends --no-install-suggests \
     avr-libc \
@@ -41,6 +42,7 @@ eot
 WORKDIR /build
 
 RUN <<eot
+  set -e
   git clone git://git.savannah.nongnu.org/simulavr.git
   (
     cd simulavr
@@ -59,6 +61,7 @@ RUN git clone $KLIPPER_REPOSITORY klipper
 COPY klipper ./klipper/
 
 RUN <<eot
+  set -e
   (
     cd klipper
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
@@ -72,6 +75,7 @@ RUN <<eot
 eot
 
 RUN <<eot
+  set -e
   git clone $MOONRAKER_REPOSITORY moonraker
   (
     cd moonraker
@@ -83,6 +87,7 @@ RUN <<eot
 eot
 
 RUN <<eot
+  set -e
   git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer
   (
     cd mjpg-streamer
@@ -112,6 +117,7 @@ WORKDIR /output
 COPY klipper_config ./printer_data/config
 
 RUN <<eot
+  set -e
   (
     cd printer_data
     mkdir comms
@@ -155,6 +161,7 @@ WORKDIR /printer
 COPY --from=build /output .
 
 RUN <<eot
+  set -e
   apt-get update -qq
   apt-get install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
