@@ -7,7 +7,7 @@ ARG MOONRAKER_REPOSITORY=https://github.com/Arksine/moonraker
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
 
-FROM debian:bookworm as build
+FROM debian:bookworm AS build
 
 ARG KLIPPER_REPOSITORY
 ARG MOONRAKER_REPOSITORY
@@ -112,7 +112,7 @@ RUN git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse
 
 COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images
 
-WORKDIR /output
+WORKDIR /printer
 
 COPY klipper_config ./printer_data/config
 
@@ -136,14 +136,16 @@ RUN <<eot
   mv /build/kiauh/resources/shell_command.cfg ./printer_data/config/printer/shell_command.cfg
   mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
   mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./printer_data/config/printer/timelapse.cfg
+  virtualenv klippy-env
   ./klippy-env/bin/python -m compileall klipper/klippy
+  virtualenv moonraker-env
   ./moonraker-env/bin/python -m compileall moonraker/moonraker
   python3 -m compileall pysimulavr
 eot
 
 ## final
 
-FROM debian:bookworm-slim as final
+FROM debian:bookworm-slim AS final
 
 ARG KLIPPER_REPOSITORY
 ARG MOONRAKER_REPOSITORY
@@ -158,7 +160,7 @@ ENV SIMULAVR_PACING_RATE=0.0
 
 WORKDIR /printer
 
-COPY --from=build /output .
+COPY --from=build /printer .
 
 RUN <<eot
   set -e
