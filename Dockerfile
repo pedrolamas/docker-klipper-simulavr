@@ -190,4 +190,8 @@ COPY ./rootfs /
 
 USER printer
 
-ENTRYPOINT ["/usr/bin/start"]
+EXPOSE 7125 8080
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["/usr/bin/supervisord", "-n"]
