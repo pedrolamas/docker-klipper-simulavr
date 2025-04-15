@@ -7,7 +7,7 @@ git --version &>/dev/null || (
 )
 
 (
-  cd klipper
+  cd ~/klipper
   git init
   git remote add origin $KLIPPER_REPOSITORY
   git fetch origin
