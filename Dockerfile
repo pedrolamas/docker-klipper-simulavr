@@ -70,7 +70,7 @@ RUN <<eot
     rm -rf .git lib out src
   )
   virtualenv klippy-env
-  ./klippy-env/bin/pip install -r klipper/scripts/klippy-requirements.txt
+  ./klippy-env/bin/pip install --no-cache-dir -r klipper/scripts/klippy-requirements.txt
   ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
 eot
 
@@ -83,7 +83,7 @@ RUN <<eot
     rm -rf .git
   )
   virtualenv moonraker-env
-  ./moonraker-env/bin/pip install -r moonraker/scripts/moonraker-requirements.txt
+  ./moonraker-env/bin/pip install --no-cache-dir -r moonraker/scripts/moonraker-requirements.txt
 eot
 
 RUN <<eot
