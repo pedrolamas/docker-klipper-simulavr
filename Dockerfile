@@ -43,7 +43,7 @@ WORKDIR /build
 
 RUN <<eot
   set -e
-  git clone git://git.savannah.nongnu.org/simulavr.git
+  git clone https://github.com/pedrolamas/simulavr
   (
     cd simulavr
     make cfgclean python build
