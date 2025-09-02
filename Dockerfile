@@ -17,7 +17,7 @@ ARG MOONRAKER_SHA
 RUN <<eot
   set -e
   apt-get update -qq
-  apt-get install -y --no-install-recommends --no-install-suggests \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-suggests \
     avr-libc \
     cmake \
     fakeroot \
@@ -162,7 +162,7 @@ COPY --from=build /printer .
 RUN <<eot
   set -e
   apt-get update -qq
-  apt-get install -y --no-install-recommends --no-install-suggests \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends --no-install-suggests \
     ca-certificates \
     curl \
     iproute2 \
