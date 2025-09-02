@@ -7,7 +7,7 @@ ARG MOONRAKER_REPOSITORY=https://github.com/Arksine/moonraker
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
 
-FROM debian:bookworm AS build
+FROM debian:trixie AS build
 
 ARG KLIPPER_REPOSITORY
 ARG MOONRAKER_REPOSITORY
@@ -32,6 +32,7 @@ RUN <<eot
     make \
     python3 \
     python3-dev \
+    python3-setuptools \
     python3-virtualenv \
     rst2pdf \
     swig \
@@ -46,7 +47,7 @@ RUN <<eot
   git clone https://github.com/pedrolamas/simulavr
   (
     cd simulavr
-    make cfgclean python build
+    CXXFLAGS="-Wno-overloaded-virtual" make cfgclean python build
     (
       cd build/pysimulavr
       mkdir pysimulavr
@@ -142,7 +143,7 @@ eot
 
 ## final
 
-FROM debian:bookworm-slim AS final
+FROM debian:trixie-slim AS final
 
 ARG KLIPPER_REPOSITORY
 ARG MOONRAKER_REPOSITORY
