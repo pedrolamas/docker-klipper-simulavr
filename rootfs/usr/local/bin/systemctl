@@ -116,7 +116,7 @@ MY_NAME="${0##*/}"
   start | stop | restart)
     for UNIT in "${OTHER_ARGUMENTS[@]}"; do
       if [ "$UNIT" = "klipper" ]; then
-        sudo /usr/bin/supervisorctl "$COMMAND" simulavr klipper
+        sudo /usr/bin/supervisorctl "$COMMAND" simulavr klipper_mcu klipper
       else
         sudo /usr/bin/supervisorctl "$COMMAND" "$UNIT"
       fi
