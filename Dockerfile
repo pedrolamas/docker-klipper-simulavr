@@ -1,18 +1,13 @@
 # syntax = docker/dockerfile:1.6
 
-## build
+## tools
 
 ARG KLIPPER_REPOSITORY=https://github.com/klipper3d/klipper
 ARG MOONRAKER_REPOSITORY=https://github.com/Arksine/moonraker
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
 
-FROM debian:trixie AS build
-
-ARG KLIPPER_REPOSITORY
-ARG MOONRAKER_REPOSITORY
-ARG KLIPPER_SHA
-ARG MOONRAKER_SHA
+FROM debian:trixie AS tools
 
 RUN <<eot
   set -e
@@ -42,9 +37,15 @@ eot
 
 WORKDIR /build
 
+
+### simulavr
+
+FROM tools AS build_simulavr
+
+RUN git clone https://github.com/pedrolamas/simulavr
+
 RUN <<eot
   set -e
-  git clone https://github.com/pedrolamas/simulavr
   (
     cd simulavr
     CXXFLAGS="-Wno-overloaded-virtual" make cfgclean python build
@@ -57,17 +58,51 @@ RUN <<eot
   )
 eot
 
-RUN git clone $KLIPPER_REPOSITORY klipper
 
-COPY klipper ./klipper/
+## klipper
+
+FROM tools AS klipper_source
+
+ARG KLIPPER_REPOSITORY
+ARG KLIPPER_SHA
+
+RUN <<eot
+  set -e
+  git clone $KLIPPER_REPOSITORY klipper
+  (
+    cd klipper
+    [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
+  )
+eot
+
+FROM klipper_source AS build_klipper_simulavr
+
+COPY klipper/simulavr.config ./klipper/.config
+
+RUN <<eot
+  (
+    cd klipper
+    make
+  )
+eot
+
+FROM klipper_source AS build_klipper_host
+
+COPY klipper/host.config ./klipper/.config
+
+RUN <<eot
+  (
+    cd klipper
+    make
+  )
+eot
+
+FROM klipper_source AS build_klipper
 
 RUN <<eot
   set -e
   (
     cd klipper
-    [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
-    make
-    mv out/klipper.elf simulavr.elf
     rm -rf .git lib out src
   )
   virtualenv klippy-env
@@ -75,21 +110,42 @@ RUN <<eot
   ./klippy-env/bin/python klipper/klippy/chelper/__init__.py
 eot
 
+
+## moonraker
+
+FROM tools AS build_moonraker
+
+ARG MOONRAKER_REPOSITORY
+ARG MOONRAKER_SHA
+
 RUN <<eot
   set -e
   git clone $MOONRAKER_REPOSITORY moonraker
   (
     cd moonraker
     [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
+  )
+eot
+
+RUN <<eot
+  set -e
+  (
+    cd moonraker
     rm -rf .git
   )
   virtualenv moonraker-env
   ./moonraker-env/bin/pip install --no-compile --no-cache-dir -r moonraker/scripts/moonraker-requirements.txt
 eot
 
+
+## mjpg-streamer
+
+FROM tools AS build_mjpg_streamer
+
+RUN git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer
+
 RUN <<eot
   set -e
-  git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer
   (
     cd mjpg-streamer
     (
@@ -105,17 +161,49 @@ RUN <<eot
   )
 eot
 
-RUN git clone --depth 1 https://github.com/pedrolamas/klipper-virtual-pins
+COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images/
 
-RUN git clone --depth 1 https://github.com/th33xitus/kiauh
 
-RUN git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse
+## other components
 
-COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images
+FROM tools AS others_source
 
-WORKDIR /printer
+RUN <<eot
+  git clone --depth 1 https://github.com/pedrolamas/klipper-virtual-pins
+  git clone --depth 1 https://github.com/th33xitus/kiauh
+  git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse
+eot
 
-COPY klipper_config ./printer_data/config
+
+## prepare rootfs
+
+FROM tools AS rootfs
+
+COPY rootfs .
+
+COPY --from=build_klipper_host /build/klipper/out/klipper.elf ./usr/local/bin/klipper_mcu
+
+WORKDIR /build/printer
+
+COPY klipper_config ./printer_data/config/
+
+COPY --from=build_klipper /build/klipper ./klipper/
+COPY --from=build_klipper /build/klippy-env ./klippy-env/
+
+COPY --from=build_klipper_simulavr /build/klipper/out/klipper.elf ./klipper/simulavr.elf
+
+COPY --from=build_moonraker /build/moonraker ./moonraker/
+COPY --from=build_moonraker /build/moonraker-env ./moonraker-env/
+
+COPY --from=build_simulavr /build/simulavr/build/pysimulavr/pysimulavr ./pysimulavr/
+
+COPY --from=build_mjpg_streamer /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer/
+
+COPY --from=others_source /build/klipper-virtual-pins/virtual_pins.py ./klipper/klippy/extras/virtual_pins.py
+COPY --from=others_source /build/kiauh/kiauh/extensions/gcode_shell_cmd/assets/gcode_shell_command.py ./klipper/klippy/extras/gcode_shell_command.py
+COPY --from=others_source /build/kiauh/kiauh/extensions/gcode_shell_cmd/assets/shell_command.cfg ./printer_data/config/printer/shell_command.cfg
+COPY --from=others_source /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
+COPY --from=others_source /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./printer_data/config/printer/timelapse.cfg
 
 RUN <<eot
   set -e
@@ -126,20 +214,11 @@ RUN <<eot
     mkdir gcodes
     mkdir logs
   )
-  mv /build/klipper .
-  mv /build/klippy-env .
-  mv /build/moonraker .
-  mv /build/moonraker-env .
-  mv /build/simulavr/build/pysimulavr/pysimulavr .
-  mv /build/mjpg-streamer/mjpg-streamer-experimental ./mjpg-streamer
-  mv /build/klipper-virtual-pins/virtual_pins.py ./klipper/klippy/extras/virtual_pins.py
-  mv /build/kiauh/kiauh/extensions/gcode_shell_cmd/assets/gcode_shell_command.py ./klipper/klippy/extras/gcode_shell_command.py
-  mv /build/kiauh/kiauh/extensions/gcode_shell_cmd/assets/shell_command.cfg ./printer_data/config/printer/shell_command.cfg
-  mv /build/moonraker-timelapse/component/timelapse.py ./moonraker/moonraker/components/timelapse.py
-  mv /build/moonraker-timelapse/klipper_macro/timelapse.cfg ./printer_data/config/printer/timelapse.cfg
   virtualenv klippy-env
   virtualenv moonraker-env
+  chown -R 1000:1000 .
 eot
+
 
 ## final
 
@@ -157,8 +236,6 @@ ENV MOONRAKER_SHA=$MOONRAKER_SHA
 ENV SIMULAVR_PACING_RATE=0.0
 
 WORKDIR /printer
-
-COPY --from=build /printer .
 
 RUN <<eot
   set -e
@@ -181,10 +258,9 @@ RUN <<eot
   groupadd --force -g 1000 printer
   useradd -rm -d /printer -g 1000 -u 1000 printer
   echo 'printer ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/printer
-  chown -hR printer:printer .
 eot
 
-COPY ./rootfs /
+COPY --from=rootfs /build /
 
 USER printer
 
