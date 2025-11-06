@@ -80,6 +80,7 @@ FROM klipper_source AS build_klipper_simulavr
 COPY klipper/simulavr.config ./klipper/.config
 
 RUN <<eot
+  set -e
   (
     cd klipper
     make
@@ -91,6 +92,7 @@ FROM klipper_source AS build_klipper_host
 COPY klipper/host.config ./klipper/.config
 
 RUN <<eot
+  set -e
   (
     cd klipper
     make
@@ -169,6 +171,7 @@ COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images/
 FROM tools AS others_source
 
 RUN <<eot
+  set -e
   git clone --depth 1 https://github.com/pedrolamas/klipper-virtual-pins
   git clone --depth 1 https://github.com/th33xitus/kiauh
   git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse
@@ -182,6 +185,12 @@ FROM tools AS rootfs
 COPY rootfs .
 
 COPY --from=build_klipper_host /build/klipper/out/klipper.elf ./usr/local/bin/klipper_mcu
+
+RUN <<eot
+  set -e
+  chmod +x ./usr/local/bin/*
+  chmod +x ./docker-entrypoint.sh
+eot
 
 WORKDIR /build/printer
 
