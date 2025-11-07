@@ -8,6 +8,16 @@ on:
     - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
+      klipperSha:
+        description: "Klipper commit SHA to build"
+        required: false
+        default: ""
+        type: string
+      moonrakerSha:
+        description: "Moonraker commit SHA to build"
+        required: false
+        default: ""
+        type: string
       forceBuild:
         description: "Force image build"
         required: false
@@ -27,18 +37,34 @@ jobs:
       klipper_sha: ${{ steps.repo.outputs.klipper_sha }}
       moonraker_sha: ${{ steps.repo.outputs.moonraker_sha }}
       image_sha: ${{ steps.repo.outputs.image_sha }}
+      is_latest: ${{ steps.repo.outputs.is_latest }}
       build_image: ${{ steps.check.outputs.build_image }}
     steps:
       - name: Get Klipper and Moonraker metadata
         id: repo
         run: |
-          KLIPPER_SHA=$(git ls-remote $KLIPPER_REPOSITORY HEAD | awk '{print $1}')
-          MOONRAKER_SHA=$(git ls-remote $MOONRAKER_REPOSITORY HEAD | awk '{print $1}')
+          LATEST=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+
+          KLIPPER_SHA="${{ github.event.inputs.klipperSha }}"
+          if [ -n "$KLIPPER_SHA" ]; then
+            LATEST=false
+          else
+            KLIPPER_SHA=$(git ls-remote $KLIPPER_REPOSITORY HEAD | awk '{print $1}')
+          fi
+
+          MOONRAKER_SHA="${{ github.event.inputs.moonrakerSha }}"
+          if [ -n "$MOONRAKER_SHA" ]; then
+            LATEST=false
+          else
+            MOONRAKER_SHA=$(git ls-remote $MOONRAKER_REPOSITORY HEAD | awk '{print $1}')
+          fi
+
           IMAGE_SHA=$(echo $KLIPPER_SHA-$MOONRAKER_SHA | sha1sum | awk '{print $1}')
 
           echo "klipper_sha=${KLIPPER_SHA}" >> $GITHUB_OUTPUT
           echo "moonraker_sha=${MOONRAKER_SHA}" >> $GITHUB_OUTPUT
           echo "image_sha=${IMAGE_SHA}" >> $GITHUB_OUTPUT
+          echo "is_latest=${LATEST}" >> $GITHUB_OUTPUT
 
       - name: Check if new Docker image should be built
         id: check
@@ -82,7 +108,7 @@ jobs:
             type=raw,value=klipper-sha-${{ needs.setup.outputs.klipper_sha }}
             type=raw,value=moonraker-sha-${{ needs.setup.outputs.moonraker_sha }}
             type=raw,value=sha-${{ needs.setup.outputs.image_sha }}
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=raw,value=latest,enable=${{ needs.setup.outputs.is_latest }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
