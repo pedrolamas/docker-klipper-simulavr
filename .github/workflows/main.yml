@@ -43,20 +43,20 @@ jobs:
       - name: Get Klipper and Moonraker metadata
         id: repo
         run: |
-          LATEST=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-
-          KLIPPER_SHA="${{ github.event.inputs.klipperSha }}"
-          if [ -n "$KLIPPER_SHA" ]; then
-            LATEST=false
-          else
+          if [ -z "$KLIPPER_SHA" ]; then
             KLIPPER_SHA=$(git ls-remote $KLIPPER_REPOSITORY HEAD | awk '{print $1}')
+          elif "$IS_LATEST"; then
+            KLIPPER_HEAD_SHA=$(git ls-remote $KLIPPER_REPOSITORY HEAD | awk '{print $1}')
+
+            [ "$KLIPPER_SHA" = "$KLIPPER_HEAD_SHA" ] || IS_LATEST=false
           fi
 
-          MOONRAKER_SHA="${{ github.event.inputs.moonrakerSha }}"
-          if [ -n "$MOONRAKER_SHA" ]; then
-            LATEST=false
-          else
+          if [ -z "$MOONRAKER_SHA" ]; then
             MOONRAKER_SHA=$(git ls-remote $MOONRAKER_REPOSITORY HEAD | awk '{print $1}')
+          elif "$IS_LATEST"; then
+            MOONRAKER_HEAD_SHA=$(git ls-remote $MOONRAKER_REPOSITORY HEAD | awk '{print $1}')
+
+            [ "$MOONRAKER_SHA" = "$MOONRAKER_HEAD_SHA" ] || IS_LATEST=false
           fi
 
           IMAGE_SHA=$(echo $KLIPPER_SHA-$MOONRAKER_SHA | sha1sum | awk '{print $1}')
@@ -64,18 +64,23 @@ jobs:
           echo "klipper_sha=${KLIPPER_SHA}" >> $GITHUB_OUTPUT
           echo "moonraker_sha=${MOONRAKER_SHA}" >> $GITHUB_OUTPUT
           echo "image_sha=${IMAGE_SHA}" >> $GITHUB_OUTPUT
-          echo "is_latest=${LATEST}" >> $GITHUB_OUTPUT
+          echo "is_latest=${IS_LATEST}" >> $GITHUB_OUTPUT
+        env:
+          IS_LATEST: ${{ endsWith(github.ref, github.event.repository.default_branch) }}
+          KLIPPER_SHA: ${{ github.event.inputs.klipperSha }}
+          MOONRAKER_SHA: ${{ github.event.inputs.moonrakerSha }}
 
       - name: Check if new Docker image should be built
         id: check
         run: |
-          BUILD_IMAGE=${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.forceBuild == 'true') }}
-
           if ! "$BUILD_IMAGE"; then
-            docker buildx imagetools inspect ghcr.io/${{ github.repository }}:sha-${{ steps.repo.outputs.image_sha }} > /dev/null || BUILD_IMAGE=true
+            docker buildx imagetools inspect ghcr.io/${GITHUB_REPOSITORY}:sha-${IMAGE_SHA} > /dev/null || BUILD_IMAGE=true
           fi
 
           echo "build_image=${BUILD_IMAGE}" >> $GITHUB_OUTPUT
+        env:
+          BUILD_IMAGE: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.forceBuild == 'true') }}
+          IMAGE_SHA: ${{ steps.repo.outputs.image_sha }}
 
   build:
     name: Build and deploy
