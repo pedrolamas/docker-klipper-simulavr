@@ -68,7 +68,7 @@ ARG KLIPPER_SHA
 
 RUN <<eot
   set -e
-  git clone $KLIPPER_REPOSITORY klipper
+  git clone --filter=blob:none $KLIPPER_REPOSITORY klipper
   (
     cd klipper
     [ -n "$KLIPPER_SHA" ] && git reset --hard $KLIPPER_SHA || true
@@ -122,7 +122,7 @@ ARG MOONRAKER_SHA
 
 RUN <<eot
   set -e
-  git clone $MOONRAKER_REPOSITORY moonraker
+  git clone --filter=blob:none $MOONRAKER_REPOSITORY moonraker
   (
     cd moonraker
     [ -n "$MOONRAKER_SHA" ] && git reset --hard $MOONRAKER_SHA || true
