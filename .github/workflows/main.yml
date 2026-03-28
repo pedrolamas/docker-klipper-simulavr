@@ -140,7 +140,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           build-args: |
             KLIPPER_REPOSITORY=${{ env.KLIPPER_REPOSITORY }}
             KLIPPER_SHA=${{ needs.setup.outputs.klipper_sha }}
