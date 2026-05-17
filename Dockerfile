@@ -6,6 +6,11 @@ ARG KLIPPER_REPOSITORY=https://github.com/klipper3d/klipper
 ARG MOONRAKER_REPOSITORY=https://github.com/Arksine/moonraker
 ARG KLIPPER_SHA
 ARG MOONRAKER_SHA
+ARG SIMULAVR_SHA
+ARG MJPG_STREAMER_SHA
+ARG KLIPPER_VIRTUAL_PINS_SHA
+ARG KIAUH_SHA
+ARG MOONRAKER_TIMELAPSE_SHA
 
 FROM debian:trixie AS tools
 
@@ -42,7 +47,9 @@ WORKDIR /build
 
 FROM tools AS build_simulavr
 
-RUN git clone https://github.com/pedrolamas/simulavr
+ARG SIMULAVR_SHA
+
+RUN : "${SIMULAVR_SHA}" && git clone https://github.com/pedrolamas/simulavr
 
 RUN <<eot
   set -e
@@ -144,7 +151,9 @@ eot
 
 FROM tools AS build_mjpg_streamer
 
-RUN git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer
+ARG MJPG_STREAMER_SHA
+
+RUN : "${MJPG_STREAMER_SHA}" && git clone --depth 1 https://github.com/jacksonliam/mjpg-streamer
 
 RUN <<eot
   set -e
@@ -170,8 +179,13 @@ COPY mjpg_streamer_images ./mjpg-streamer/mjpg-streamer-experimental/images/
 
 FROM tools AS others_source
 
+ARG KLIPPER_VIRTUAL_PINS_SHA
+ARG KIAUH_SHA
+ARG MOONRAKER_TIMELAPSE_SHA
+
 RUN <<eot
   set -e
+  : "${KLIPPER_VIRTUAL_PINS_SHA}" "${KIAUH_SHA}" "${MOONRAKER_TIMELAPSE_SHA}"
   git clone --depth 1 https://github.com/pedrolamas/klipper-virtual-pins
   git clone --depth 1 https://github.com/th33xitus/kiauh
   git clone --depth 1 https://github.com/mainsail-crew/moonraker-timelapse

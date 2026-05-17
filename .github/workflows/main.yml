@@ -36,6 +36,11 @@ jobs:
     outputs:
       klipper_sha: ${{ steps.repo.outputs.klipper_sha }}
       moonraker_sha: ${{ steps.repo.outputs.moonraker_sha }}
+      simulavr_sha: ${{ steps.repo.outputs.simulavr_sha }}
+      mjpg_streamer_sha: ${{ steps.repo.outputs.mjpg_streamer_sha }}
+      klipper_virtual_pins_sha: ${{ steps.repo.outputs.klipper_virtual_pins_sha }}
+      kiauh_sha: ${{ steps.repo.outputs.kiauh_sha }}
+      moonraker_timelapse_sha: ${{ steps.repo.outputs.moonraker_timelapse_sha }}
       image_sha: ${{ steps.repo.outputs.image_sha }}
       is_latest: ${{ steps.repo.outputs.is_latest }}
       build_image: ${{ steps.check.outputs.build_image }}
@@ -61,8 +66,19 @@ jobs:
 
           IMAGE_SHA=$(echo $KLIPPER_SHA-$MOONRAKER_SHA | sha1sum | awk '{print $1}')
 
+          SIMULAVR_SHA=$(git ls-remote https://github.com/pedrolamas/simulavr HEAD | awk '{print $1}')
+          MJPG_STREAMER_SHA=$(git ls-remote https://github.com/jacksonliam/mjpg-streamer HEAD | awk '{print $1}')
+          KLIPPER_VIRTUAL_PINS_SHA=$(git ls-remote https://github.com/pedrolamas/klipper-virtual-pins HEAD | awk '{print $1}')
+          KIAUH_SHA=$(git ls-remote https://github.com/th33xitus/kiauh HEAD | awk '{print $1}')
+          MOONRAKER_TIMELAPSE_SHA=$(git ls-remote https://github.com/mainsail-crew/moonraker-timelapse HEAD | awk '{print $1}')
+
           echo "klipper_sha=${KLIPPER_SHA}" >> $GITHUB_OUTPUT
           echo "moonraker_sha=${MOONRAKER_SHA}" >> $GITHUB_OUTPUT
+          echo "simulavr_sha=${SIMULAVR_SHA}" >> $GITHUB_OUTPUT
+          echo "mjpg_streamer_sha=${MJPG_STREAMER_SHA}" >> $GITHUB_OUTPUT
+          echo "klipper_virtual_pins_sha=${KLIPPER_VIRTUAL_PINS_SHA}" >> $GITHUB_OUTPUT
+          echo "kiauh_sha=${KIAUH_SHA}" >> $GITHUB_OUTPUT
+          echo "moonraker_timelapse_sha=${MOONRAKER_TIMELAPSE_SHA}" >> $GITHUB_OUTPUT
           echo "image_sha=${IMAGE_SHA}" >> $GITHUB_OUTPUT
           echo "is_latest=${IS_LATEST}" >> $GITHUB_OUTPUT
         env:
@@ -146,6 +162,11 @@ jobs:
             KLIPPER_SHA=${{ needs.setup.outputs.klipper_sha }}
             MOONRAKER_REPOSITORY=${{ env.MOONRAKER_REPOSITORY }}
             MOONRAKER_SHA=${{ needs.setup.outputs.moonraker_sha }}
+            SIMULAVR_SHA=${{ needs.setup.outputs.simulavr_sha }}
+            MJPG_STREAMER_SHA=${{ needs.setup.outputs.mjpg_streamer_sha }}
+            KLIPPER_VIRTUAL_PINS_SHA=${{ needs.setup.outputs.klipper_virtual_pins_sha }}
+            KIAUH_SHA=${{ needs.setup.outputs.kiauh_sha }}
+            MOONRAKER_TIMELAPSE_SHA=${{ needs.setup.outputs.moonraker_timelapse_sha }}
           push: true
           sbom: true
           provenance: true
