@@ -71,16 +71,12 @@ MY_NAME="${0##*/}"
       print $1, state, pid
     }')
 
-    shopt -s nullglob
-    CONF_FILES=(/etc/supervisor/supervisord.conf /etc/supervisor/conf.d/*.conf)
-    shopt -u nullglob
-
     get_unit_config() {
       local unit="$1" key="$2"
       awk -v unit="$unit" -v key="$key" '
         /^\[program:/ { in_section = ($0 == "[program:" unit "]") }
         in_section && $0 ~ ("^" key "=") { print substr($0, length(key)+2); exit }
-      ' "${CONF_FILES[@]}"
+      ' /etc/supervisor/supervisord.conf
     }
 
     for UNIT in "${OTHER_ARGUMENTS[@]}"; do
